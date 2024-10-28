@@ -1,2 +1,2 @@
-# react-learning
-Aprendendo a utilizar o React com Projetos Práticos na FIAP.
+npm create vite@latest . -- --template react
+npm install --save styled-components
