@@ -1,42 +1,52 @@
-import { useState } from "react"
-import { DivEtiquetas } from "../styled"
+import { useState } from "react";
+import { DivEtiquetas } from "../styled";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from 'yup';
+
+
+const schema = yup.object({
+    nome: yup.string().required('O nome é obrigatório'),
+    email: yup.string().email('Este formato de e-mail nao é válido').required('O e-mail é obrigatório'),
+    cpf: yup.string().min(11, 'O CPF deve ter no mínimo 11 caracteres').required('O CPF é obrigatório')
+})
 
 
 export default function Etiquetas(){
     
-    const [cliente, setCliente] = useState({"nome": '', "email": '', "cpf": ''});
+    //const [cliente, setCliente] = useState({"nome": '', "email": '', "cpf": ''});
 
     const [listaCliente, setListaCliente] = useState([]);
 
+    const {register, handleSubmit, formState:{errors}} = useForm({
+        resolver: yupResolver(schema)
+    })
 
-    function cadastroCliente(event){
-        setCliente({...cliente, [event.target.name]: event.target.value});
-    }
+    //function cadastroCliente(event){
+    //    setCliente({...cliente, [event.target.name]: event.target.value});
+   // }
 
-    function inserirCliente(event){
-        event.preventDefault();
-
+    function inserirCliente(cliente){
         setListaCliente([...listaCliente, cliente])
     }
 
 
-
     return(
         <DivEtiquetas>
-            <form onSubmit={inserirCliente}>
+            <form onSubmit={handleSubmit(inserirCliente)}>
                 <fieldset>
                     <legend>Dados Pessoais</legend>
                     <label> Nome:
-                        <input type="text" name="nome"
-                            onChange={cadastroCliente} value={cliente.nome}/>
+                        <input type="text" {...register('nome')}/>
+                        <span>{errors.nome?.message}</span>
                     </label>
                     <label> E-mail:
-                        <input type="email" name="email"
-                            onChange={cadastroCliente} value={cliente.email}/>
+                        <input type="email" {...register('email')}/>
+                        <span>{errors.email?.message}</span>
                     </label>
                     <label> CPF:
-                        <input type="text" name="cpf"
-                            onChange={cadastroCliente} value={cliente.cpf}/>
+                        <input type="text" {...register('cpf')}/>
+                        <span>{errors.cpf?.message}</span>
                     </label>
                     <button type="submit">Enviar</button>
                 </fieldset>
@@ -45,18 +55,17 @@ export default function Etiquetas(){
             <div className="painel">
 
                 {
-                    listaCliente.map
+                    listaCliente.map((cli, index) => 
+                        // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+                        <div className="etiqueta" key={index}>
+                            <p>Nome: {cli.nome}</p>
+                            <p>E-mail: {cli.email}</p>
+                            <p>CPF: {cli.cpf}</p>
+                        </div>
+                    )
                 }
 
-          
-
-                <div className="etiqueta">
-                    <p>Nome: {cliente.nome}</p>
-                    <p>E-mail: {cliente.email}</p>
-                    <p>CPF: {cliente.cpf}</p>
-                </div>
             </div>
-
         </DivEtiquetas>
 
     )
