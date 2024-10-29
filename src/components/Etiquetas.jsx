@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { DivEtiquetas } from "../styled";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from 'yup';
 
@@ -18,7 +18,7 @@ export default function Etiquetas(){
 
     const [listaCliente, setListaCliente] = useState([]);
 
-    const {register, handleSubmit, formState:{errors}} = useForm({
+    const {register, handleSubmit, formState:{errors}, setValue, setFocus} = useForm({
         resolver: yupResolver(schema)
     })
 
@@ -27,7 +27,22 @@ export default function Etiquetas(){
    // }
 
     function inserirCliente(cliente){
-        setListaCliente([...listaCliente, cliente])
+        setListaCliente([...listaCliente, cliente]);
+    }
+
+    function buscarCEP(event){
+
+        const cep = event.target.value.replace(/\D/g, "");
+        fetch(`https://viacep.com.br/ws/${cep}/json`).then(response => response.json()).then(data => {
+
+            setValue('rua', data.logradouro)
+            setValue('bairro', data.bairro)
+            setValue('cidade', data.localidade)
+            setValue('estado', data.uf)
+            setFocus('numero')
+        })
+
+
     }
 
 
@@ -49,6 +64,29 @@ export default function Etiquetas(){
                         <span>{errors.cpf?.message}</span>
                     </label>
                     <button type="submit">Enviar</button>
+                </fieldset>
+                <fieldset>
+                    <legend>Endereco</legend>
+                    <label> CEP
+                        <input type="text" {...register('cep')}
+                            onBlur={buscarCEP} 
+                        />
+                    </label>
+                    <label> Rua:
+                        <input type="text" {...register('rua')}/>
+                    </label>
+                    <label> Número:
+                        <input type="text" {...register('numero')}/>
+                    </label>
+                    <label> Bairro:
+                        <input type="text" {...register('bairro')}/>
+                    </label>
+                    <label> Cidade:
+                        <input type="text" {...register('cidade')}/>
+                    </label>
+                    <label> Estado:
+                        <input type="text" {...register('estado')}/>
+                    </label>
                 </fieldset>
             </form>
 

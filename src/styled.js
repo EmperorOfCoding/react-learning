@@ -58,8 +58,6 @@ export const DivEtiquetas = styled.div`
         background-color: #a5f;
         border-radius: 5px;
     }
-
-
-
-
 `
+
+
